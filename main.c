@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <string.h>
 #include "tareas.h"
 #include "kanban.h"
 #include "estadisticas.h"

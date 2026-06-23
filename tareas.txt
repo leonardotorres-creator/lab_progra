@@ -1,7 +1,3 @@
-1|Direcion de codigo|Anahi Loyola|Media|En Progreso
-2|Modelo de codigo|Camilo |Alta|Pendiente
-3|Creador de txt|Leonardo|Baja|Finalizada
-1005|Error de sistema|Leonardo|Alta|En Progreso
-2004|Cambios de dise�o|Anahi|Media|Pendiente
-1001|Modificacion de codigo|Camilo|Baja|Pendiente
-4|Optimizacion de codigo|Camilo|Alta|Pendiente
+1001,Dise;o,Leonardo,Media,Pendiente
+1002,Revison,Anahi,Media,Pendiente
+1003,Programa,Camilo,]Alta,Finalizada

@@ -34,7 +34,7 @@ int main() {
                 break;
 
             case 2: 
-                mostrarKanban(tareas, n); 
+                mostrarKanban(tareas, &n); 
                 break;
 
             case 3: 
@@ -79,7 +79,7 @@ void guardarEnArchivo(Tarea tareas[], int n) {
     }
 
     for (int i = 0; i < n; i++) {
-        fprintf(archivo, "%d|%s|%s|%s|%s\n",
+        fprintf(archivo, "%d,%s,%s,%s,%s\n",
             tareas[i].codigo,
             tareas[i].titulo,
             tareas[i].responsable,

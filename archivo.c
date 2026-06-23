@@ -30,11 +30,7 @@ void cargarTareas(Tarea tareas[], int *n) {
 
     *n = 0;
 
-    while (fscanf(f, "%d;%[^;];%[^;];%d\n",
-                  &tareas[*n].codigo,
-                  tareas[*n].titulo,
-                  tareas[*n].responsable,
-                  &tareas[*n].estado) != EOF) {
+    while (fscanf(f, "%d;%[^;];%[^;];%d\n", &tareas[*n].codigo, tareas[*n].titulo, tareas[*n].responsable, &tareas[*n].estado) != EOF) {
         (*n)++;
     }
 

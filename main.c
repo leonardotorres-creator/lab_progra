@@ -3,11 +3,11 @@
 #include "tareas.h"
 #include "kanban.h"
 #include "estadisticas.h"
-#include "archivo.h"
 
-// Prototipos extra
+// Prototipos
 void buscarPorCodigo(Tarea tareas[], int n);
 void buscarPorResponsable(Tarea tareas[], int n);
+void guardarEnArchivo(Tarea tareas[], int n);
 
 int main() {
     Tarea tareas[100];
@@ -30,25 +30,31 @@ int main() {
         switch(op) {
             case 1: 
                 registrarTarea(tareas, &n); 
-                guardarTareas(tareas, n);
+                guardarEnArchivo(tareas, n);
                 break;
+
             case 2: 
                 mostrarKanban(tareas, n); 
                 break;
+
             case 3: 
-                buscarPorCodigo(tareas, n);
+                buscarPorCodigo(tareas, n); 
                 break;
+
             case 4: 
-                buscarPorResponsable(tareas, n);
+                buscarPorResponsable(tareas, n); 
                 break;
+
             case 5: 
-                cambiarEstado(tareas, n);
-                guardarTareas(tareas, n);
+                cambiarEstado(tareas, n); 
+                guardarEnArchivo(tareas, n);
                 break;
+
             case 6: 
-                eliminarTarea(tareas, &n);
-                guardarTareas(tareas, n);
+                eliminarTarea(tareas, &n); 
+                guardarEnArchivo(tareas, n);
                 break;
+
             case 7: 
                 mostrarEstadisticas(tareas, n); 
                 break;
@@ -56,10 +62,35 @@ int main() {
 
     } while(op != 0);
 
+    // Guardado final al salir
+    guardarEnArchivo(tareas, n);
+
     return 0;
 }
 
-// FUNCIONES DE BUSQUEDA
+// ================= FUNCIONES =================
+
+void guardarEnArchivo(Tarea tareas[], int n) {
+    FILE *archivo = fopen("tareas.txt", "w");
+
+    if (archivo == NULL) {
+        printf("Error al crear el archivo\n");
+        return;
+    }
+
+    for (int i = 0; i < n; i++) {
+        fprintf(archivo, "%d|%s|%s|%s|%s\n",
+            tareas[i].codigo,
+            tareas[i].titulo,
+            tareas[i].responsable,
+            tareas[i].prioridad,
+            tareas[i].estado);
+    }
+
+    fclose(archivo);
+}
+
+// -------- BUSQUEDAS --------
 
 void buscarPorCodigo(Tarea tareas[], int n) {
     int codigo, i;

@@ -3,6 +3,6 @@
 
 #include "tareas.h"
 
-void mostrarEstadisticas(Tarea tareas[], int n);
+void mostrarEstadisticas(Nodo *cab);
 
 #endif

@@ -3,7 +3,7 @@
 
 #include "tareas.h"
 
-void mostrarKanban(Tarea tareas[], int *n);
-void cambiarEstado(Tarea tareas[], int n);
+void mostrarKanban(Nodo *cab);
+void cambiarEstado(Nodo *cab);
 
 #endif

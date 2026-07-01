@@ -9,8 +9,21 @@ typedef struct {
     char estado[20];
 } Tarea;
 
-// Funciones
-void registrarTarea(Tarea tareas[], int *n);
-void eliminarTarea(Tarea tareas[], int *n);
+typedef struct Nodo {
+    Tarea dato;
+    struct Nodo *ant;
+    struct Nodo *sig;
+} Nodo;
+
+// Funciones principales
+void registrarTarea(Nodo **cab);
+void eliminarTarea(Nodo **cab);
+
+// Utilidades de la lista doblemente enlazada
+Nodo* crearNodo(Tarea n);
+void insertarFinal(Nodo **cab, Tarea n);
+Nodo* buscarPorCodigo(Nodo *cab, int codigo);
+void eliminarNodo(Nodo **cab, int codigo);
+void liberarLista(Nodo **cab);
 
 #endif

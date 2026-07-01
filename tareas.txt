@@ -1,3 +1,5 @@
 1001,Dise;o,Leonardo,Media,Pendiente
 1002,Revison,Anahi,Media,Pendiente
 1003,Programa,Camilo,]Alta,Finalizada
+1005,Prueba,Leonardo,Alta,En Progreso
+1004,Prueba 2,Anahi,Media,Finalizada

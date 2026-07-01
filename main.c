@@ -1,21 +1,25 @@
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 #include "tareas.h"
 #include "kanban.h"
 #include "estadisticas.h"
+#include "colors.h"
 
-// Prototipos
-void buscarPorCodigo(Tarea tareas[], int n);
-void buscarPorResponsable(Tarea tareas[], int n);
-void guardarEnArchivo(Tarea tareas[], int n);
+// Prototipos locales
+void buscarPorCodigoMain(Nodo *cab);
+void buscarPorResponsableMain(Nodo *cab);
+void guardarEnArchivo(Nodo *cab);
+void cargarDesdeArchivo(Nodo **cab);
 
 int main() {
-    Tarea tareas[100];
-    int n = 0;
+    Nodo *lista = NULL;
     int op;
 
+    cargarDesdeArchivo(&lista);
+
     do {
-        printf("\n===== MENU =====\n");
+        printf(YELLOW"\n===== MENU =====\n");
         printf("1. Registrar tarea\n");
         printf("2. Mostrar Kanban\n");
         printf("3. Buscar por codigo\n");
@@ -24,113 +28,117 @@ int main() {
         printf("6. Eliminar tarea\n");
         printf("7. Estadisticas\n");
         printf("0. Salir\n");
-        printf("Opcion: ");
+        printf("Opcion: "RESET);
         scanf("%d", &op);
 
         switch(op) {
             case 1: 
-                registrarTarea(tareas, &n); 
-                guardarEnArchivo(tareas, n);
+                registrarTarea(&lista); 
+                guardarEnArchivo(lista);
                 break;
-
             case 2: 
-                mostrarKanban(tareas, &n); 
+                mostrarKanban(lista); 
                 break;
-
             case 3: 
-                buscarPorCodigo(tareas, n); 
+                buscarPorCodigoMain(lista); 
                 break;
-
             case 4: 
-                buscarPorResponsable(tareas, n); 
+                buscarPorResponsableMain(lista); 
                 break;
-
             case 5: 
-                cambiarEstado(tareas, n); 
-                guardarEnArchivo(tareas, n);
+                cambiarEstado(lista); 
+                guardarEnArchivo(lista);
                 break;
-
             case 6: 
-                eliminarTarea(tareas, &n); 
-                guardarEnArchivo(tareas, n);
+                eliminarTarea(&lista); 
+                guardarEnArchivo(lista);
                 break;
-
             case 7: 
-                mostrarEstadisticas(tareas, n); 
+                mostrarEstadisticas(lista); 
                 break;
         }
 
     } while(op != 0);
 
-    // Guardado final al salir
-    guardarEnArchivo(tareas, n);
+    // Guardado final y liberación de memoria RAM
+    guardarEnArchivo(lista);
+    liberarLista(&lista);
 
     return 0;
 }
 
-// ================= FUNCIONES =================
+// ================= FUNCIONES I/O =================
 
-void guardarEnArchivo(Tarea tareas[], int n) {
+void cargarDesdeArchivo(Nodo **cab) {
+    FILE *archivo = fopen("tareas.txt", "r");
+    if (archivo == NULL) return; // Si no existe aún, iniciamos vacío
+    
+    Tarea t;
+    // Utilizamos un formato estricto para evitar leer comas como datos
+    while (fscanf(archivo, "%d,%[^,],%[^,],%[^,],%[^\n]\n", &t.codigo, t.titulo, t.responsable, t.prioridad, t.estado) != EOF) {
+        insertarFinal(cab, t);
+    }
+    fclose(archivo);
+}
+
+void guardarEnArchivo(Nodo *cab) {
     FILE *archivo = fopen("tareas.txt", "w");
-
     if (archivo == NULL) {
-        printf("Error al crear el archivo\n");
+        printf(RED"Error al abrir archivo para guardar\n"RESET);
         return;
     }
 
-    for (int i = 0; i < n; i++) {
+    Nodo *aux = cab;
+    while(aux != NULL) {
         fprintf(archivo, "%d,%s,%s,%s,%s\n",
-            tareas[i].codigo,
-            tareas[i].titulo,
-            tareas[i].responsable,
-            tareas[i].prioridad,
-            tareas[i].estado);
+            aux->dato.codigo,
+            aux->dato.titulo,
+            aux->dato.responsable,
+            aux->dato.prioridad,
+            aux->dato.estado);
+        aux = aux->sig;
     }
 
     fclose(archivo);
 }
 
-// -------- BUSQUEDAS --------
+// ================= BUSQUEDAS =================
 
-void buscarPorCodigo(Tarea tareas[], int n) {
-    int codigo, i;
+void buscarPorCodigoMain(Nodo *cab) {
+    int codigo;
 
-    printf("Codigo: ");
+    printf(BLUE"Codigo: "RESET);
     scanf("%d", &codigo);
 
-    for(i = 0; i < n; i++) {
-        if(tareas[i].codigo == codigo) {
-            printf("\nEncontrada:\n");
-            printf("%d - %s - %s - %s - %s\n",
-                tareas[i].codigo,
-                tareas[i].titulo,
-                tareas[i].responsable,
-                tareas[i].prioridad,
-                tareas[i].estado);
-            return;
-        }
+    Nodo *aux = buscarPorCodigo(cab, codigo);
+    if(aux != NULL) {
+        printf(GREEN"\nEncontrada:\n"RESET);
+        printf(BLUE"%d - %s - %s - %s - %s\n"RESET,
+            aux->dato.codigo, aux->dato.titulo,
+            aux->dato.responsable, aux->dato.prioridad,
+            aux->dato.estado);
+    } else {
+        printf(RED"No encontrada\n"RESET);
     }
-
-    printf("No encontrada\n");
 }
 
-void buscarPorResponsable(Tarea tareas[], int n) {
+void buscarPorResponsableMain(Nodo *cab) {
     char nombre[50];
-    int i, encontrado = 0;
+    int encontrado = 0;
 
-    printf("Responsable: ");
+    printf(BLUE"Responsable: "RESET);
     scanf(" %[^\n]", nombre);
 
-    for(i = 0; i < n; i++) {
-        if(strcmp(tareas[i].responsable, nombre) == 0) {
+    Nodo *aux = cab;
+    while(aux != NULL) {
+        if(strcmp(aux->dato.responsable, nombre) == 0) {
             printf("[%d] %s (%s)\n",
-                tareas[i].codigo,
-                tareas[i].titulo,
-                tareas[i].estado);
+                aux->dato.codigo, aux->dato.titulo, aux->dato.estado);
             encontrado = 1;
         }
+        aux = aux->sig;
     }
 
     if(!encontrado)
-        printf("No hay tareas para ese responsable\n");
+        printf(RED"No hay tareas para ese responsable\n"RESET);
 }

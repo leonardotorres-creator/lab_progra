@@ -1,72 +1,61 @@
 #include <stdio.h>
 #include <string.h>
 #include "kanban.h"
+#include "colors.h"
 
-void mostrarKanban(Tarea tareas[], int *n) {
-    int i;
-    FILE *archivo = fopen("tareas.txt", "r");
-    
-    if (archivo == NULL) {
-        printf("Error: El archivo tareas.txt no existe o no se pudo abrir.\n");
-        return;
+void mostrarKanban(Nodo *cab) {
+    Nodo *aux;
+
+    printf(CYAN"\n===== PENDIENTES =====\n"RESET);
+    aux = cab;
+    while(aux != NULL) {
+        if(strcmp(aux->dato.estado, "Pendiente") == 0)
+            printf(GRAY"[%d] %s\n"RESET, aux->dato.codigo, aux->dato.titulo);
+        aux = aux->sig;
     }
 
-    *n = 0; // Reiniciar el contador de tareas
-
-// Ahora usamos comas para separar los campos y los juegos de caracteres [^,]
-    while (fscanf(archivo, "%d,%[^,],%[^,],%[^,],%s\n", &tareas[*n].codigo, tareas[*n].titulo, tareas[*n].responsable, tareas[*n].prioridad, tareas[*n].estado) != EOF) {
-        (*n)++;
+    printf(CYAN"\n===== EN PROGRESO =====\n"RESET);
+    aux = cab;
+    while(aux != NULL) {
+        if(strcmp(aux->dato.estado, "En Progreso") == 0)
+            printf(MAGENTA"[%d] %s\n"RESET, aux->dato.codigo, aux->dato.titulo);
+        aux = aux->sig;
     }
 
-    printf("\n===== PENDIENTES =====\n");
-    for(i = 0; i < *n; i++) {
-        if(strcmp(tareas[i].estado, "Pendiente") == 0)
-            printf("[%d] %s\n", tareas[i].codigo, tareas[i].titulo);
+    printf(CYAN"\n===== FINALIZADAS =====\n"RESET);
+    aux = cab;
+    while(aux != NULL) {
+        if(strcmp(aux->dato.estado, "Finalizada") == 0)
+            printf(GREEN"[%d] %s\n"RESET, aux->dato.codigo, aux->dato.titulo);
+        aux = aux->sig;
     }
-
-    printf("\n===== EN PROGRESO =====\n");
-    for(i = 0; i < *n; i++) {
-        if(strcmp(tareas[i].estado, "En Progreso") == 0)
-            printf("[%d] %s\n", tareas[i].codigo, tareas[i].titulo);
-    }
-
-    printf("\n===== FINALIZADAS =====\n");
-    for(i = 0; i < *n; i++) {
-        if(strcmp(tareas[i].estado, "Finalizada") == 0)
-            printf("[%d] %s\n", tareas[i].codigo, tareas[i].titulo);
-    }
-
-    fclose (archivo);
 }
 
-void cambiarEstado(Tarea tareas[], int n) {
-    int codigo, i, op;
+void cambiarEstado(Nodo *cab) {
+    int codigo, op;
 
-    printf("Codigo de tarea: ");
+    printf(YELLOW"Codigo de tarea: "RESET);
     scanf("%d", &codigo);
 
-    for(i = 0; i < n; i++) {
-        if(tareas[i].codigo == codigo) {
+    Nodo *aux = buscarPorCodigo(cab, codigo);
+    if(aux != NULL) {
+        printf(YELLOW"1. Pendiente\n2. En Progreso\n3. Finalizada\n"RESET);
+        printf(YELLOW"Nuevo estado: "RESET);
+        scanf("%d", &op);
 
-            printf("1. Pendiente\n2. En Progreso\n3. Finalizada\n");
-            printf("Nuevo estado: ");
-            scanf("%d", &op);
-
-            if(op == 1)
-                strcpy(tareas[i].estado, "Pendiente");
-            else if(op == 2)
-                strcpy(tareas[i].estado, "En Progreso");
-            else if(op == 3)
-                strcpy(tareas[i].estado, "Finalizada");
-            else {
-                printf("Opcion invalida\n");
-                return;
-            }
-
-            printf("Estado actualizado\n");
+        if(op == 1)
+            strcpy(aux->dato.estado, "Pendiente");
+        else if(op == 2)
+            strcpy(aux->dato.estado, "En Progreso");
+        else if(op == 3)
+            strcpy(aux->dato.estado, "Finalizada");
+        else {
+            printf(RED"Opcion invalida\n"RESET);
             return;
         }
-    }
 
-    printf("Tarea no encontrada\n");
+        printf(GREEN"Estado actualizado\n"RESET);
+    } else {
+        printf(RED"Tarea no encontrada\n"RESET);
+    }
 }
